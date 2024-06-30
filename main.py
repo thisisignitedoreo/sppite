@@ -44,8 +44,9 @@ def download_file(url, callback=None):
 
 def unarchive_file(file, dst):
     # assume that file is txz
-    log("decompressing")
-    file = lzma.decompress(file)
+    if file.startswith(b"\xFD\x37\x7A\x58\x5A\x00"):
+        log("decompressing")
+        file = lzma.decompress(file)
     with tarfile.TarFile(fileobj=io.BytesIO(file)) as t:
         log("unextracting")
         t.extractall(dst)
@@ -55,7 +56,9 @@ def cmd(binary, args):
     subprocess.run([binary, *args])
 
 def dl_callback(val, max_val, files=1, cf=0):
-    print(f'[p] {round(val/max_val*(100/files)+(100/files*cf)):>3}%', end="\r")
+    perc = val/max_val*(1/files)+(1/files*cf)
+    length = os.get_terminal_size().columns - 11
+    print(f'[p] {round(perc*100):>3}% [{"#" * round(perc*length)}{":" * length-round(perc*length)}]', end="\r")
 
 def mkdir(path): os.makedirs(path, exist_ok=True)
 

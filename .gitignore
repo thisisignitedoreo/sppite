@@ -4,3 +4,4 @@ main.build
 main.exe
 main.cmd
 *.tar.xz
+*.tar
