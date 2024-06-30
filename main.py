@@ -158,7 +158,7 @@ def is_portal_path(path):
 
 def load_config():
     if not os.path.isfile(config_path):
-        json.dump({"portal_path": None, "repositories": ["https://www.p2r3.com/spplice/repo2/index.json", "https://thisisignitedoreo.github.io/sppite/index.json"]}, open("config.json", "w"))
+        json.dump({"portal_path": None, "repositories": ["https://www.p2r3.com/spplice/repo2/index.json", "https://thisisignitedoreo.github.io/sppite/index.json"]}, open(config_path, "w"))
     return json.load(open(config_path))
 
 def save_config(config):
