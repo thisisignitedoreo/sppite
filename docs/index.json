@@ -1,0 +1,12 @@
+{
+    "packages": [
+        {
+            "title": "Krzyhau's Speedrun Mod",
+            "name": "speedrun-mod",
+            "author": "Krzyhau",
+            "file": "https://thisisignitedoreo.github.io/sppite/speedrun-mod/mod.txz",
+            "icon": null,
+            "description": "Krzyhau's Speedrun Mod. https://github.com/p2sr/Portal2SpeedrunMod<br><br>packaged by aciddev_"
+        }
+    ]
+}
