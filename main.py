@@ -5,6 +5,7 @@
 
 import os
 import io
+import sys
 import lzma
 import json
 import shutil
@@ -112,9 +113,9 @@ def details(package):
     for i in package["description"].split("<br>"):
         log(i)
     log(f"author(s): {package["author"]}")
-    log("[r]un it, [d]ownload and extract it or go [b]ack?")
+    log("[r]un it, [d]ownload it, download+[e]xtract it or go [b]ack?")
     op = ask()
-    while op not in "rbd" or len(op) != 1:
+    while op not in "rbde" or len(op) != 1:
         op = ask()
     return op
 
@@ -135,18 +136,25 @@ def menu(repo):
         while not os.path.isfile(file):
             log("not a file")
             file = ask()
+        log("copying file to ram")
         run_custom(open(file, "rb").read(), config["portal_path"])
     else:
         cmd = int(cmd)-1
         op = details(repo[cmd])
         if op == "b": menu(repo)
         elif op == "r": run(repo[cmd]["file"], config["portal_path"])
-        elif op == "d":
+        elif op == "e":
             log("downloading mod")
             mod = download_file(repo[cmd]["file"], callback=dl_callback)
             print("[p] done")
             unarchive_file(mod, repo[cmd]["name"])
             log(f"unarchived at `{repo[cmd]["name"]}`")
+        elif op == "d":
+            log("downloading mod")
+            mod = download_file(repo[cmd]["file"], callback=dl_callback)
+            print("[p] done")
+            open(f"{repo[cmd]["name"]}.tar.xz", "wb").write(mod)
+            log(f"downloaded at `{repo[cmd]["name"]}.tar.xz`")
 
 def fetch_repo(repo_url):
     req = requests.get(repo_url)
@@ -180,17 +188,26 @@ if __name__ == "__main__":
         config["portal_path"] = path
         save_config(config)
     
-    log("fetching mod repositories")
-    repo = []
-    for i in config["repositories"]:
-        log(f"fetching {i}")
-        r = fetch_repo(i)
-        if r is None:
-            log("error, skipping")
-            continue
-        repo += r["packages"]
-    
-    if len(repo) == 0:
-        error("none repositories are feteched. internet problems, presumably?")
+    if len(sys.argv) == 1:
+        log("fetching mod repositories")
+        repo = []
+        for i in config["repositories"]:
+            log(f"fetching {i}")
+            r = fetch_repo(i)
+            if r is None:
+                log("error, skipping")
+                continue
+            repo += r["packages"]
+        
+        if len(repo) == 0:
+            error("none repositories are feteched. internet problems?")
 
-    menu(repo)
+        menu(repo)
+    else:
+        file = sys.argv[1]
+        if os.path.isfile(file):
+            log("copying file to ram")
+            run_custom(open(file, "rb").read(), config["portal_path"])
+        else:
+            error("not a file")
+    input()
