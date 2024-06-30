@@ -52,15 +52,22 @@ def cmd(binary, args):
     print(f'[$] "{binary}" {' '.join(args)}')
     subprocess.run([binary, *args])
 
-def dl_callback(val, max_val):
-    print(f'[p] {round(val/max_val*100):>3}%', end="\r")
+def dl_callback(val, max_val, files=1, cf=0):
+    print(f'[p] {round(val/max_val*(100/files)+(100/files*cf)):>3}%', end="\r")
 
 def mkdir(path): os.makedirs(path, exist_ok=True)
 
 def run(mod_url, game_folder):
     log("downloading the mod")
-    mod = download_file(mod_url, dl_callback)
-    print("[p] done")
+    if isinstance(mod_url, list):
+        mods = []
+        for k, i in enumerate(mod_url):
+            mods.append(download_file(i, lambda x, y: dl_callback(x, y, len(mod_url), k)))
+        mod = b""
+        for i in mods: mod += i
+    else:
+        mod = download_file(mod_url, dl_callback)
+        print("[p] done")
     run_custom(mod, game_folder)
 
 def run_custom(mod, game_folder):
@@ -156,8 +163,6 @@ def save_config(config):
 
 def error(string):
     print('[!]', string)
-    input()
-    exit()
 
 config = load_config()
 

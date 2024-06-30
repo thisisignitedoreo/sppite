@@ -1,16 +1,16 @@
 
 # sppite
-sppline 2 alternative client that does not suck (as much)
+spplice 2 alternative client that does not suck (as much)
 
-_i got so bored hacking sppline 2 i decided to remake it from scratch_
+_i got so bored hacking spplice 2 i decided to remake it from scratch_
 
 ## features
 pros:
 - allows selecting any portal 2 path (wink wink)
 - shit fast
-- supports any sppline 2 mod (as far as i tested)
-  note: sppline 2 has something called jsInterface,
-  i did not implement that, but, i did not see any
+- supports any spplice 2 mod (as far as i tested)   <br />
+  note: spplice 2 has something called jsInterface, <br />
+  i did not implement that, but, i did not see any  <br />
   mods with it
 - has built in repository browser
 
@@ -23,13 +23,11 @@ just run it, and see what it does.
 
 ## faq
 
-Q: does it support pirated versions of portal 2?
-
+Q: does it support pirated versions of portal 2?<br />
 A: yes >:)
 
-Q: how one might change repository?
-
-A: run program, generate config.json, and add it there
+Q: how one might change/add/remove repositories?<br />
+A: run program, generate config.json, and do stuff in there
 
 ---
 
