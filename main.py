@@ -57,8 +57,8 @@ def cmd(binary, args):
 
 def dl_callback(val, max_val, files=1, cf=0):
     perc = val/max_val*(1/files)+(1/files*cf)
-    length = os.get_terminal_size().columns - 11
-    print(f'[p] {round(perc*100):>3}% [{"#" * round(perc*length)}{":" * length-round(perc*length)}]', end="\r")
+    length = os.get_terminal_size().columns - 12
+    print(f'[p] {round(perc*100):>3}% [{"#" * round(perc*length)}{":" * (length-round(perc*length))}]', end="\r")
 
 def mkdir(path): os.makedirs(path, exist_ok=True)
 
