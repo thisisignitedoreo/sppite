@@ -29,7 +29,7 @@ A: yes >:)
 
 Q: how one might change repository?
 
-A: run program, generate config.json, and set it there
+A: run program, generate config.json, and add it there
 
 ---
 

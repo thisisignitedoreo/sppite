@@ -42,12 +42,14 @@ def download_file(url, callback=None):
 
 def unarchive_file(file, dst):
     # assume that file is txz
+    log("decompressing")
     file = lzma.decompress(file)
     with tarfile.TarFile(fileobj=io.BytesIO(file)) as t:
+        log("unextracting")
         t.extractall(dst)
 
 def cmd(binary, args):
-    print(f'[c] "{binary}" {' '.join(args)}')
+    print(f'[$] "{binary}" {' '.join(args)}')
     subprocess.run([binary, *args])
 
 def dl_callback(val, max_val):
@@ -59,7 +61,9 @@ def run(mod_url, game_folder):
     log("downloading the mod")
     mod = download_file(mod_url, dl_callback)
     print("[p] done")
+    run_custom(mod, game_folder)
 
+def run_custom(mod, game_folder):
     log("creating tempcontent folder")
     tempcontent_folder = os.path.join(game_folder, "portal2_tempcontent")
 
@@ -105,44 +109,61 @@ def details(package):
     return op
 
 def menu(repo):
-    for k, i in enumerate(repo["packages"], start=1):
+    for k, i in enumerate(repo, start=1):
         log(f'{k:>3}. {i['title']}')
+    log(f'  c. select custom mod')
     log(f'  q. quit the application')
 
     cmd = ask()
-    while cmd not in map(lambda x: str(x+1), range(len(repo["packages"]))) and cmd != "q":
+    while cmd not in map(lambda x: str(x+1), range(len(repo))) and cmd != "q" and cmd != "c":
         cmd = ask()
     
     if cmd == "q": exit()
+    elif cmd == "c":
+        log("select file location (.tar.xz .txz)")
+        file = ask()
+        while not os.path.isfile(file):
+            log("not a file")
+            file = ask()
+        run_custom(open(file, "rb").read(), config["portal_path"])
     else:
         cmd = int(cmd)-1
-        op = details(repo["packages"][cmd])
+        op = details(repo[cmd])
         if op == "b": menu(repo)
-        elif op == "r": run(repo["packages"][cmd]["file"], config["portal_path"])
+        elif op == "r": run(repo[cmd]["file"], config["portal_path"])
         elif op == "d":
             log("downloading mod")
-            mod = download_file(repo["packages"][cmd]["file"], callback=dl_callback)
+            mod = download_file(repo[cmd]["file"], callback=dl_callback)
             print("[p] done")
-            unarchive_file(mod, repo["packages"][cmd]["name"])
-            log(f"unarchived at `{repo["packages"][cmd]["name"]}`")
+            unarchive_file(mod, repo[cmd]["name"])
+            log(f"unarchived at `{repo[cmd]["name"]}`")
 
 def fetch_repo(repo_url):
-    return requests.get(repo_url).json()
+    req = requests.get(repo_url)
+    if not req.ok: return None
+    return req.json()
 
 def is_portal_path(path):
     return os.path.isfile(os.path.join(path, "portal2.exe"))
 
 def load_config():
     if not os.path.isfile("config.json"):
-        json.dump({"portal_path": None, "repo_path": "https://www.p2r3.com/spplice/repo2/index.json"}, open("config.json", "w"))
+        json.dump({"portal_path": None, "repositories": ["https://www.p2r3.com/spplice/repo2/index.json"]}, open("config.json", "w"))
     return json.load(open("config.json"))
 
 def save_config(config):
     json.dump(config, open("config.json", "w"))
 
+def error(string):
+    print('[!]', string)
+    input()
+    exit()
+
 config = load_config()
 
 if __name__ == "__main__":
+    os.chdir(os.path.dirname(__file__))
+
     if not config["portal_path"]:
         log("no portal path specified, presumably first run")
         log("write path to your portal 2 game")
@@ -153,7 +174,17 @@ if __name__ == "__main__":
         config["portal_path"] = path
         save_config(config)
     
-    log("fetching mod repository")
-    repo = fetch_repo(config["repo_path"])
+    log("fetching mod repositories")
+    repo = []
+    for i in config["repositories"]:
+        log(f"fetching {i}")
+        r = fetch_repo(i)
+        if r is None:
+            log("error, skipping")
+            continue
+        repo += r["packages"]
+    
+    if len(repo) == 0:
+        error("none repositories are feteched. internet problems, presumably?")
 
     menu(repo)

@@ -1,2 +1,7 @@
 .vscode/
 config.json
+main.build
+main.exe
+main.cmd
+*.txz
+*.tar.xz
