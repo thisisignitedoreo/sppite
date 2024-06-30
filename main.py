@@ -13,6 +13,7 @@ import requests
 import subprocess
 
 DL_CHUNK_SIZE = 65536
+config_path = os.path.join(os.getenv("localappdata"), "sppite", "config.json")
 
 def log(string=""):
     print(f'[i] {string}')
@@ -56,6 +57,8 @@ def dl_callback(val, max_val, files=1, cf=0):
     print(f'[p] {round(val/max_val*(100/files)+(100/files*cf)):>3}%', end="\r")
 
 def mkdir(path): os.makedirs(path, exist_ok=True)
+
+mkdir(os.path.dirname(config_path))
 
 def run(mod_url, game_folder):
     log("downloading the mod")
@@ -154,12 +157,12 @@ def is_portal_path(path):
     return os.path.isfile(os.path.join(path, "portal2.exe"))
 
 def load_config():
-    if not os.path.isfile("config.json"):
+    if not os.path.isfile(config_path):
         json.dump({"portal_path": None, "repositories": ["https://www.p2r3.com/spplice/repo2/index.json", "https://thisisignitedoreo.github.io/sppite/index.json"]}, open("config.json", "w"))
-    return json.load(open("config.json"))
+    return json.load(open(config_path))
 
 def save_config(config):
-    json.dump(config, open("config.json", "w"))
+    json.dump(config, open(config_path, "w"))
 
 def error(string):
     print('[!]', string)
@@ -168,6 +171,8 @@ config = load_config()
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(__file__))
+    print(__file__)
+    input()
 
     if not config["portal_path"]:
         log("no portal path specified, presumably first run")
