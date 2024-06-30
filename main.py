@@ -170,10 +170,6 @@ def error(string):
 config = load_config()
 
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(__file__))
-    print(__file__)
-    input()
-
     if not config["portal_path"]:
         log("no portal path specified, presumably first run")
         log("write path to your portal 2 game")
