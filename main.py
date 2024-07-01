@@ -8,6 +8,7 @@ import io
 import sys
 import lzma
 import json
+import psutil
 import shutil
 import tarfile
 import requests
@@ -77,7 +78,15 @@ def run(mod_url, game_folder):
         print("[p] done")
     run_custom(mod, game_folder)
 
+def kill_game():
+    for i in psutil.process_iter(["pid", "name"]):
+        if i.name() == "portal2.exe":
+            log("found portal 2 process, killing it")
+            i.kill()
+
 def run_custom(mod, game_folder):
+    kill_game()
+
     log("creating tempcontent folder")
     tempcontent_folder = os.path.join(game_folder, "portal2_tempcontent")
 
