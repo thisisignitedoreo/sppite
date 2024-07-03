@@ -86,7 +86,9 @@ def kill_game():
 
 def copyall(src, dst):
     for i in os.listdir(src):
-        shutil.copytree(os.path.join(src, i), dst)
+        if os.path.isfile(os.path.join(src, i)): copyfunc = shutil.copy
+        else: copyfunc = shutil.copytree
+        copyfunc(os.path.join(src, i), os.path.join(dst, i))
 
 def run_folder(mod, game_folder): run_custom(mod, game_folder, True)
 
