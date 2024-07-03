@@ -84,7 +84,13 @@ def kill_game():
             log("found portal 2 process, killing it")
             i.kill()
 
-def run_custom(mod, game_folder):
+def copyall(src, dst):
+    for i in os.listdir(src):
+        shutil.copytree(os.path.join(src, i), dst)
+
+def run_folder(mod, game_folder): run_custom(mod, game_folder, True)
+
+def run_custom(mod, game_folder, as_folder=False):
     kill_game()
 
     log("creating tempcontent folder")
@@ -96,19 +102,26 @@ def run_custom(mod, game_folder):
     os.mkdir(tempcontent_folder)
 
     log("installing the mod")
-    unarchive_file(mod, tempcontent_folder)
+    if as_folder: copyall(mod, tempcontent_folder)
+    else: unarchive_file(mod, tempcontent_folder)
 
     log("copying soundcache")
     src = os.path.join(game_folder, "portal2/maps/soundcache/_master.cache")
     dst = os.path.join(tempcontent_folder, "maps/soundcache/_master.cache")
     mkdir(os.path.dirname(dst))
-    if os.path.isfile(src): shutil.copy(src, dst)
+    if os.path.isfile(src):
+        log(f"portal2/maps/soundcache/_master.cache -> tempcontent/maps/soundcache/_master.cache")
+        shutil.copy(src, dst)
     else:
         src = os.path.join(game_folder, "portal2_dlc1/maps/soundcache/_master.cache")
-        if os.path.isfile(src): shutil.copy(src, dst)
+        if os.path.isfile(src):
+            log(f"portal2_dlc1/maps/soundcache/_master.cache -> tempcontent/maps/soundcache/_master.cache")
+            shutil.copy(src, dst)
         else:
             src = os.path.join(game_folder, "portal2_dlc2/maps/soundcache/_master.cache")
-            if os.path.isfile(src): shutil.copy(src, dst)
+            if os.path.isfile(src):
+                log(f"portal2_dlc2/maps/soundcache/_master.cache -> tempcontent/maps/soundcache/_master.cache")
+                shutil.copy(src, dst)
             else:
                 log("no soundcache found")
 
@@ -221,5 +234,4 @@ if __name__ == "__main__":
             log("copying file to ram")
             run_custom(open(file, "rb").read(), config["portal_path"])
         else:
-            error("not a file")
-    input()
+            run_folder(file, config["portal_path"])
