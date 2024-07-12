@@ -29,6 +29,9 @@ A: yes >:)
 Q: how one might change/add/remove repositories?<br />
 A: run program, generate config.json, and do stuff in there
 
+Q: where is config.json is stored?<br />
+A: %localappdata%/sppite/config.json
+
 ---
 
 _hi p2r3_
